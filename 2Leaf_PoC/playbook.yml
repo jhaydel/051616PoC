@@ -5,12 +5,6 @@
   roles:
     - localhost
     
-- hosts: edge
-  user: cumulus
-  become: yes
-  roles:
-    - edge
-    
 - hosts: network
   user: cumulus
   become: yes

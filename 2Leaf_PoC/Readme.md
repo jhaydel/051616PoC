@@ -26,28 +26,15 @@ $ git clone https://github.com/jhaydel/051616PoC.git
 
 - cd into the github directory on your laptop/server which was cloned, then into the Vagrant sub-directory
 ```bash
-cd ~/051616PoC/Vagrant
+cd ~/051616PoC/2Leaf_PoC
 ```
 
 - turn on the mgmt vm and the layer 2 oob switch connected to it
 ```bash
-$ vagrant up oob-mgmt-server oob-mgmt-switch
+$ vagrant up oob-mgmt-server OOB01
 ```
 
 - use the vagrant ssh mgmt command to connect to the mgmt vm
-```bash
-$ vagrant ssh oob-mgmt-server
-Welcome to Ubuntu 14.04.4 LTS (GNU/Linux 4.2.0-27-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com/
-----------------------------------------------------------------
-  Ubuntu 14.04.4 LTS                          built 2016-02-20
-----------------------------------------------------------------
-Last login: Mon Mar  7 12:29:28 2016 from 10.0.2.2
-vagrant@oob-mgmt-server:~$
-```
-#turnup.sh  Script
-There is an optional script that will take care of the first 3 steps automatically
 ```bash
 $ vagrant ssh oob-mgmt-server
 Welcome to Ubuntu 14.04.4 LTS (GNU/Linux 4.2.0-27-generic x86_64)
@@ -60,6 +47,11 @@ Last login: Tue Mar  8 17:21:42 2016 from 10.0.2.2
 vagrant@oob-mgmt-server:~$ sudo -i
 root@oob-mgmt-server:~# cd /home/vagrant/
 root@oob-mgmt-server:/home/vagrant# sh turnup.sh
+
+- logout of oob-mgmt-server
+```bash
+root@oob-mgmt-server:~# exit
+vagrant@oob-mgmt-server:~ exit
 ```
 
 - turn on the rest of the VMs from the laptop/server
@@ -82,7 +74,8 @@ This should be installed by default, but here is the directions for installing l
 Run MLAG Scenario 
 ------
 Load Scenario1 into vagrant topology
-```cumulus@oob-mgmt-server:~$ ansible-playbook playbook.yml -e "s=1"```
+```vagrant@oob-mgmt-server:~$ cd /home/vagrant/051616PoC/2Leaf_PoC```
+```vagrant@oob-mgmt-server:~$ ansible-playbook playbook.yml -e "s=1"```
 
 IP Address Schema
 ------
