@@ -71,6 +71,15 @@ This should be installed by default, but here is the directions for installing l
 - Install Ansible
 ```~$ sudo apt-get install ansible -qy```
 
+#Setup SSH keys and deploy to the network
+```bash
+root@oob-mgmt-server:~/phonecom# ssh-keygen -t rsa
+root@oob-mgmt-server:~/phonecom# cp /root/.ssh/id_rsa.pub /var/www/html/authorized_keys
+root@oob-mgmt-server:~/phonecom# cp ~/CUSTOMER/var/www/ztp_deploy.sh /var/www/html/
+root@oob-mgmt-server:~/phonecom# ansible-playbook deploy_ssh_keys.yml -u vagrant -k
+  - (pwd: vagrant)
+```
+
 Run MLAG Scenario 
 ------
 Load Scenario1 into vagrant topology
