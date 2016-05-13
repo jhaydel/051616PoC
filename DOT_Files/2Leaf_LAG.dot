@@ -20,10 +20,10 @@ graph dc1 {
 
    "Core01":"swp48" -- "Core02":"swp48"
 
-   "Spine01":"swp20" -- "Core01":"swp01"
-   "Spine01":"swp21" -- "Core02":"swp01"
-   "Spine02":"swp20" -- "Core01":"swp02"
-   "Spine02":"swp21" -- "Core02":"swp02"
+   "Spine01":"swp20" -- "Core01":"swp1"
+   "Spine01":"swp21" -- "Core02":"swp1"
+   "Spine02":"swp20" -- "Core01":"swp2"
+   "Spine02":"swp21" -- "Core02":"swp2"
 
    "Spine01":"swp1" -- "Spine02":"swp1"
    "Spine01":"swp2" -- "Spine01":"swp3"
