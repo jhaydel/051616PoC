@@ -129,4 +129,13 @@ iface hostbond3
   bond-lacp-rate 1
   bond-min-links 1  
   clag-id 4   
-  
+
+auto hostbond4
+iface hostbond4
+  bond-slaves swp13 swp14
+  bond-miimon 100
+  bond-use-carrier 1
+  bond-xmit-hash-policy layer3+4
+  bond-lacp-rate 1
+  bond-min-links 1  
+  clag-id 5   

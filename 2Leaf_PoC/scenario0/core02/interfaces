@@ -5,6 +5,14 @@ iface lo inet loopback
 auto eth0
 iface eth0 inet dhcp
 
+auto swp1
+iface swp1
+    post-up ip link set $IFACE promisc on
+
+auto swp2
+iface swp2
+    post-up ip link set $IFACE promisc on
+    
 auto bridge
 iface bridge
   bridge-ports peerlink cumulusbond
