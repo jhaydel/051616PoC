@@ -74,6 +74,5 @@ graph dc1 {
    "OOB01":"swp9" -- "Host02":"eth4"
    "OOB01":"swp10" -- "Host03":"eth4"
    "OOB01":"swp11" -- "Host04":"eth4"
-  
    
 }

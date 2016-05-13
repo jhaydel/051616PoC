@@ -22,6 +22,9 @@ echo -e "auto bridge" >> /etc/network/interfaces
 echo -e "iface bridge" >> /etc/network/interfaces
 echo -e "bridge-ports glob swp1-8" >> /etc/network/interfaces
 echo -e "bridge-stp on" >> /etc/network/interfaces
+echo -e "ip address 10.2.0.250/24" >> /etc/network/interfaces
+echo -e "\n\nauto vagrant" >> /etc/network/interfaces
+echo -e "iface vagrant inet dhcp\n\n" >> /etc/network/interfaces
 
 echo "#################################"
 echo "   Finished "
