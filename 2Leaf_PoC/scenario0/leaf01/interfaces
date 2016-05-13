@@ -21,8 +21,8 @@ auto swp6
 iface swp6
   post-up ip link set $IFACE promisc on
   
-auto swp09
-iface swp09
+auto swp9
+iface swp9
   post-up ip link set $IFACE promisc on
   
 auto swp10
