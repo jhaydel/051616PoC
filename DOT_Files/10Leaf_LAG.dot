@@ -1,10 +1,10 @@
 graph dc1 {
 
- "Core01" [function="leaf" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
- "Core02" [function="leaf" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
+ "Core01" [function="core" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
+ "Core02" [function="core" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
 
- "Spine01" [function="leaf" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
- "Spine02" [function="leaf" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
+ "Spine01" [function="spine" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
+ "Spine02" [function="spine" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
 
  "Leaf01" [function="leaf" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
  "Leaf02" [function="leaf" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
@@ -17,74 +17,76 @@ graph dc1 {
  "Leaf09" [function="leaf" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
  "Leaf10" [function="leaf" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
 
- "Host01" [function="host" os="boxcutter/ubuntu1404" memory="400" ubuntu=True config="./helper_scripts/extra_server_config.sh"]
- "Host02" [function="host" os="boxcutter/ubuntu1404" memory="400" ubuntu=True config="./helper_scripts/extra_server_config.sh"]
- "Host03" [function="host" os="boxcutter/ubuntu1404" memory="400" ubuntu=True config="./helper_scripts/extra_server_config.sh"]
- "Host04" [function="host" os="boxcutter/ubuntu1404" memory="400" ubuntu=True config="./helper_scripts/extra_server_config.sh"]
+ "Host01" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
+ "Host02" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
+ "Host03" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
+ "Host04" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
 
- "OOB01" [function="leaf" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
+ "OOB01" [function="oob" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
 
    "Core01":"swp48" -- "Core02":"swp48"
 
-   "Spine01":"swp45" -- "Core01":"swp01"
-   "Spine01":"swp46" -- "Core02":"swp01"
-   "Spine02":"swp45" -- "Core01":"swp02"
-   "Spine02":"swp46" -- "Core02":"swp02"
+   "Spine01":"swp20" -- "Core01":"swp01"
+   "Spine01":"swp21" -- "Core02":"swp01"
+   "Spine02":"swp20" -- "Core01":"swp02"
+   "Spine02":"swp21" -- "Core02":"swp02"
 
-   "Spine01":"swp48" -- "Spine02":"swp48"
+   "Spine01":"swp1" -- "Spine02":"swp1"
+   "Spine01":"swp2" -- "Spine01":"swp3"
+   "Spine02":"swp2" -- "Spine02":"swp3"
 
    "Spine01":"eth0" -- "OOB01":"swp1"
    "Spine02":"eth0" -- "OOB01":"swp2"
 
-   "Leaf01":"swp43" -- "Spine01":"swp1"
-   "Leaf01":"swp44" -- "Spine01":"swp2"
-   "Leaf01":"swp45" -- "Spine02":"swp1"
-   "Leaf01":"swp46" -- "Spine02":"swp2"
+   "Leaf01":"swp43" -- "Spine01":"swp28s0"
+   "Leaf01":"swp44" -- "Spine01":"swp28s1"
+   "Leaf01":"swp45" -- "Spine02":"swp28s0"
+   "Leaf01":"swp46" -- "Spine02":"swp28s1"
 
-   "Leaf02":"swp43" -- "Spine01":"swp3"
-   "Leaf02":"swp44" -- "Spine01":"swp4"
-   "Leaf02":"swp45" -- "Spine02":"swp3"
-   "Leaf02":"swp46" -- "Spine02":"swp4"
+   "Leaf02":"swp43" -- "Spine01":"swp28s2"
+   "Leaf02":"swp44" -- "Spine01":"swp28s3"
+   "Leaf02":"swp45" -- "Spine02":"swp28s2"
+   "Leaf02":"swp46" -- "Spine02":"swp28s3"
 
-   "Leaf03":"swp43" -- "Spine01":"swp5"
-   "Leaf03":"swp44" -- "Spine01":"swp6"
-   "Leaf03":"swp45" -- "Spine02":"swp5"
-   "Leaf03":"swp46" -- "Spine02":"swp6"
+   "Leaf03":"swp43" -- "Spine01":"swp29s0"
+   "Leaf03":"swp44" -- "Spine01":"swp29s1"
+   "Leaf03":"swp45" -- "Spine02":"swp29s0"
+   "Leaf03":"swp46" -- "Spine02":"swp29s1"
 
-   "Leaf04":"swp43" -- "Spine01":"swp7"
-   "Leaf04":"swp44" -- "Spine01":"swp8"
-   "Leaf04":"swp45" -- "Spine02":"swp7"
-   "Leaf04":"swp46" -- "Spine02":"swp8"
+   "Leaf04":"swp43" -- "Spine01":"swp29s2"
+   "Leaf04":"swp44" -- "Spine01":"swp29s3"
+   "Leaf04":"swp45" -- "Spine02":"swp29s2"
+   "Leaf04":"swp46" -- "Spine02":"swp29s3"
 
-   "Leaf05":"swp43" -- "Spine01":"swp9"
-   "Leaf05":"swp44" -- "Spine01":"swp10"
-   "Leaf05":"swp45" -- "Spine02":"swp9"
-   "Leaf05":"swp46" -- "Spine02":"swp10"
+   "Leaf05":"swp43" -- "Spine01":"swp30s0"
+   "Leaf05":"swp44" -- "Spine01":"swp30s1"
+   "Leaf05":"swp45" -- "Spine02":"swp30s0"
+   "Leaf05":"swp46" -- "Spine02":"swp30s1"
 
-   "Leaf06":"swp43" -- "Spine01":"swp11"
-   "Leaf06":"swp44" -- "Spine01":"swp12"
-   "Leaf06":"swp45" -- "Spine02":"swp11"
-   "Leaf06":"swp46" -- "Spine02":"swp12"
+   "Leaf06":"swp43" -- "Spine01":"swp30s2"
+   "Leaf06":"swp44" -- "Spine01":"swp30s3"
+   "Leaf06":"swp45" -- "Spine02":"swp30s2"
+   "Leaf06":"swp46" -- "Spine02":"swp30s3"
 
-   "Leaf07":"swp43" -- "Spine01":"swp13"
-   "Leaf07":"swp44" -- "Spine01":"swp14"
-   "Leaf07":"swp45" -- "Spine02":"swp13"
-   "Leaf07":"swp46" -- "Spine02":"swp14"
+   "Leaf07":"swp43" -- "Spine01":"swp31s0"
+   "Leaf07":"swp44" -- "Spine01":"swp31s1"
+   "Leaf07":"swp45" -- "Spine02":"swp31s0"
+   "Leaf07":"swp46" -- "Spine02":"swp31s1"
 
-   "Leaf08":"swp43" -- "Spine01":"swp15"
-   "Leaf08":"swp44" -- "Spine01":"swp16"
-   "Leaf08":"swp45" -- "Spine02":"swp15"
-   "Leaf08":"swp46" -- "Spine02":"swp16"
+   "Leaf08":"swp43" -- "Spine01":"swp31s2"
+   "Leaf08":"swp44" -- "Spine01":"swp31s3"
+   "Leaf08":"swp45" -- "Spine02":"swp31s2"
+   "Leaf08":"swp46" -- "Spine02":"swp31s3"
 
-   "Leaf09":"swp43" -- "Spine01":"swp17"
-   "Leaf09":"swp44" -- "Spine01":"swp18"
-   "Leaf09":"swp45" -- "Spine02":"swp17"
-   "Leaf09":"swp46" -- "Spine02":"swp18"
+   "Leaf09":"swp43" -- "Spine01":"swp32s0"
+   "Leaf09":"swp44" -- "Spine01":"swp32s1"
+   "Leaf09":"swp45" -- "Spine02":"swp32s0"
+   "Leaf09":"swp46" -- "Spine02":"swp32s1"
 
-   "Leaf10":"swp43" -- "Spine01":"swp19"
-   "Leaf10":"swp44" -- "Spine01":"swp20"
-   "Leaf10":"swp45" -- "Spine02":"swp19"
-   "Leaf10":"swp46" -- "Spine02":"swp20"
+   "Leaf10":"swp43" -- "Spine01":"swp32s2"
+   "Leaf10":"swp44" -- "Spine01":"swp32s3"
+   "Leaf10":"swp45" -- "Spine02":"swp32s2"
+   "Leaf10":"swp46" -- "Spine02":"swp32s3"
 
    "Leaf01":"swp48" -- "Leaf02":"swp48"
    "Leaf03":"swp48" -- "Leaf04":"swp48"
