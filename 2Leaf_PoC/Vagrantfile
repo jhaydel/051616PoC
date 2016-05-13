@@ -9,7 +9,7 @@
 raise "vagrant-cumulus plugin must be installed, try $ vagrant plugin install vagrant-cumulus" unless Vagrant.has_plugin? "vagrant-cumulus"
 
 Vagrant.configure("2") do |config|
-  wbid = 1463173054
+  wbid = 1463181791
 
   config.vm.provider "virtualbox" do |v|
     v.gui=false
@@ -22,7 +22,7 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "oob-mgmt-server"
     device.vm.box = "boxcutter/ubuntu1404"
     device.vm.provider "virtualbox" do |v|
-      v.name = "1463173054_oob-mgmt-server"
+      v.name = "1463181791_oob-mgmt-server"
       v.memory = 400
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -69,7 +69,7 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Spine02"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
-      v.name = "1463173054_Spine02"
+      v.name = "1463181791_Spine02"
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -169,7 +169,7 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Spine01"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
-      v.name = "1463173054_Spine01"
+      v.name = "1463181791_Spine01"
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -269,7 +269,7 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Leaf02"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
-      v.name = "1463173054_Leaf02"
+      v.name = "1463181791_Leaf02"
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -393,7 +393,7 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Leaf01"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
-      v.name = "1463173054_Leaf01"
+      v.name = "1463181791_Leaf01"
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -517,7 +517,7 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Host01"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
-      v.name = "1463173054_Host01"
+      v.name = "1463181791_Host01"
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -558,7 +558,7 @@ Vagrant.configure("2") do |config|
       device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
 
       # Run Any Extra Config
-      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+      device.vm.provision :shell , path: "./helper_scripts/extra_host_config.sh"
 
 
 
@@ -587,7 +587,7 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Host02"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
-      v.name = "1463173054_Host02"
+      v.name = "1463181791_Host02"
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -628,7 +628,7 @@ Vagrant.configure("2") do |config|
       device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
 
       # Run Any Extra Config
-      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+      device.vm.provision :shell , path: "./helper_scripts/extra_host_config.sh"
 
 
 
@@ -657,7 +657,7 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Host03"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
-      v.name = "1463173054_Host03"
+      v.name = "1463181791_Host03"
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -698,7 +698,7 @@ Vagrant.configure("2") do |config|
       device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
 
       # Run Any Extra Config
-      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+      device.vm.provision :shell , path: "./helper_scripts/extra_host_config.sh"
 
 
 
@@ -727,7 +727,7 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Host04"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
-      v.name = "1463173054_Host04"
+      v.name = "1463181791_Host04"
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -768,7 +768,7 @@ Vagrant.configure("2") do |config|
       device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
 
       # Run Any Extra Config
-      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+      device.vm.provision :shell , path: "./helper_scripts/extra_host_config.sh"
 
 
 
@@ -797,7 +797,7 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "OOB01"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
-      v.name = "1463173054_OOB01"
+      v.name = "1463181791_OOB01"
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -903,7 +903,7 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Core02"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
-      v.name = "1463173054_Core02"
+      v.name = "1463181791_Core02"
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -967,7 +967,7 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Core01"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
-      v.name = "1463173054_Core01"
+      v.name = "1463181791_Core01"
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true

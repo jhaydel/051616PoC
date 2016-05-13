@@ -10,10 +10,10 @@ graph dc1 {
  "Leaf02" [function="leaf" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
 
 
- "Host01" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
- "Host02" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
- "Host03" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
- "Host04" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
+ "Host01" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_host_config.sh"]
+ "Host02" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_host_config.sh"]
+ "Host03" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_host_config.sh"]
+ "Host04" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_host_config.sh"]
 
  "OOB01" [function="oob" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/OOB_Switch_Config.sh"]
  "oob-mgmt-server" [function="oob-server" os="boxcutter/ubuntu1404" memory="400" ubuntu=True config="./helper_scripts/OOB_Mgmt_Config.sh"]
