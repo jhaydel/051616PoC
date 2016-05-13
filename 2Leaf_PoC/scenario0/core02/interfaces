@@ -1,0 +1,50 @@
+auto lo
+iface lo inet loopback
+    address 10.0.0.82/32
+
+auto eth0
+iface eth0 inet dhcp
+
+auto bridge
+iface bridge
+  bridge-ports peerlink cumulusbond
+  bridge-vlan-aware yes
+  bridge-stp on
+  bridge-vids 1-1000
+  bridge-pvid 1
+
+auto bridge.10
+iface bridge.10
+  address 10.10.0.82/24
+
+auto bridge.20
+iface bridge.20  
+  address 10.20.0.82/24
+ 
+auto peerlink
+iface peerlink
+  bond-slaves swp48
+  bond-miimon 100
+  bond-use-carrier 1
+  bond-xmit-hash-policy layer3+4
+  bond-lacp-rate 1
+  bond-min-links 1
+    
+auto peerlink.4094
+iface peerlink.4094
+  address 169.254.1.2/30
+  clagd-enable yes
+  clagd-peer-ip 169.254.1.1
+  clagd-backup-ip 10.10.0.81
+  clagd-sys-mac 44:38:39:FF:40:94    
+  
+auto cumulusbond
+iface cumulusbond
+  bond-slaves swp20 swp21
+  bond-miimon 100
+  bond-use-carrier 1
+  bond-xmit-hash-policy layer3+4
+  bond-lacp-rate 1
+  bond-min-links 1  
+  clag-id 1
+
