@@ -1,0 +1,20 @@
+---
+- include: cleanup-for-ospf.yml
+
+- include: leaf-setup.yml
+  vars:
+    v_file: "group_vars/all/main.yml"
+
+- include: host-networking.yml
+  vars:
+    v_file: "group_vars/all/routing.yml"
+
+- hosts: networking
+  user: vagrant
+  sudo: yes
+  roles:
+    - ospf_unnum
+  vars_files:
+    - group_vars/all/routing.yml
+  handlers:
+    - include : handlers/main.yml

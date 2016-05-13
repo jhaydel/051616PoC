@@ -1,0 +1,1734 @@
+# Created by Topology-Converter v4.0.5
+#    using topology data from: ./DOT_Files/10Leaf_LAG.dot
+#    NOTE: in order to use this Vagrantfile you will need:
+#       -Vagrant(v1.7+) installed: http://www.vagrantup.com/downloads 
+#       -Cumulus Plugin for Vagrant installed: $ vagrant plugin install vagrant-cumulus
+#       -the "helper_scripts" directory that comes packaged with topology-converter.py 
+#       -Virtualbox installed: https://www.virtualbox.org/wiki/Downloads
+
+raise "vagrant-cumulus plugin must be installed, try $ vagrant plugin install vagrant-cumulus" unless Vagrant.has_plugin? "vagrant-cumulus"
+
+Vagrant.configure("2") do |config|
+  wbid = 1463114200
+
+  config.vm.provider "virtualbox" do |v|
+    v.gui=false
+
+  end
+
+
+  ##### DEFINE VM for OOB01 #####
+  config.vm.define "OOB01" do |device|
+    device.vm.hostname = "OOB01"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_OOB01"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp10 --> Leaf08:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net1", auto_config: false , :mac => "443839000002"
+      
+      # link for swp11 --> Leaf09:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net30", auto_config: false , :mac => "44383900003C"
+      
+      # link for swp12 --> Leaf10:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net44", auto_config: false , :mac => "443839000058"
+      
+      # link for swp8 --> Leaf06:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net43", auto_config: false , :mac => "443839000056"
+      
+      # link for swp9 --> Leaf07:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net9", auto_config: false , :mac => "443839000012"
+      
+      # link for swp2 --> Spine02:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net64", auto_config: false , :mac => "443839000080"
+      
+      # link for swp3 --> Leaf01:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net36", auto_config: false , :mac => "443839000048"
+      
+      # link for swp1 --> Spine01:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net35", auto_config: false , :mac => "443839000046"
+      
+      # link for swp6 --> Leaf04:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net52", auto_config: false , :mac => "443839000068"
+      
+      # link for swp7 --> Leaf05:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net55", auto_config: false , :mac => "44383900006E"
+      
+      # link for swp4 --> Leaf02:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net7", auto_config: false , :mac => "44383900000E"
+      
+      # link for swp5 --> Leaf03:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net32", auto_config: false , :mac => "443839000040"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc8', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc9', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc10', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc11', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc12', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc13', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype6", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype7", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype8", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype9", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype10", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype11", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype12", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype13", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000002 swp10"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900003C swp11"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000058 swp12"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000056 swp8"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000012 swp9"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000080 swp2"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000048 swp3"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000046 swp1"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000068 swp6"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900006E swp7"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900000E swp4"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000040 swp5"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Leaf07 #####
+  config.vm.define "Leaf07" do |device|
+    device.vm.hostname = "Leaf07"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Leaf07"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp48 --> Leaf08:swp48
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net20", auto_config: false , :mac => "443839000027"
+      
+      # link for swp43 --> Spine01:swp13
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net4", auto_config: false , :mac => "443839000007"
+      
+      # link for eth0 --> OOB01:swp9
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net9", auto_config: false , :mac => "443839000011"
+      
+      # link for swp46 --> Spine02:swp14
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net42", auto_config: false , :mac => "443839000053"
+      
+      # link for swp45 --> Spine02:swp13
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net40", auto_config: false , :mac => "44383900004F"
+      
+      # link for swp44 --> Spine01:swp14
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net34", auto_config: false , :mac => "443839000043"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype6", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype7", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000027 swp48"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000007 swp43"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000011 eth0"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000053 swp46"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900004F swp45"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000043 swp44"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Leaf04 #####
+  config.vm.define "Leaf04" do |device|
+    device.vm.hostname = "Leaf04"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Leaf04"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp48 --> Leaf03:swp48
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net29", auto_config: false , :mac => "44383900003A"
+      
+      # link for swp43 --> Spine01:swp7
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net17", auto_config: false , :mac => "443839000021"
+      
+      # link for eth0 --> OOB01:swp6
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net52", auto_config: false , :mac => "443839000067"
+      
+      # link for swp46 --> Spine02:swp8
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net25", auto_config: false , :mac => "443839000031"
+      
+      # link for swp45 --> Spine02:swp7
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net75", auto_config: false , :mac => "443839000095"
+      
+      # link for swp44 --> Spine01:swp8
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net68", auto_config: false , :mac => "443839000087"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype6", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype7", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900003A swp48"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000021 swp43"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000067 eth0"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000031 swp46"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000095 swp45"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000087 swp44"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Leaf05 #####
+  config.vm.define "Leaf05" do |device|
+    device.vm.hostname = "Leaf05"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Leaf05"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp48 --> Leaf06:swp48
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net14", auto_config: false , :mac => "44383900001B"
+      
+      # link for swp43 --> Spine01:swp9
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net46", auto_config: false , :mac => "44383900005B"
+      
+      # link for eth0 --> OOB01:swp7
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net55", auto_config: false , :mac => "44383900006D"
+      
+      # link for swp46 --> Spine02:swp10
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net60", auto_config: false , :mac => "443839000077"
+      
+      # link for swp45 --> Spine02:swp9
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net74", auto_config: false , :mac => "443839000093"
+      
+      # link for swp44 --> Spine01:swp10
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net73", auto_config: false , :mac => "443839000091"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype6", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype7", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900001B swp48"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900005B swp43"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900006D eth0"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000077 swp46"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000093 swp45"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000091 swp44"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Leaf02 #####
+  config.vm.define "Leaf02" do |device|
+    device.vm.hostname = "Leaf02"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Leaf02"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp1 --> Host01:eth2
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net66", auto_config: false , :mac => "443839000084"
+      
+      # link for swp10 --> Host03:eth3
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net57", auto_config: false , :mac => "443839000072"
+      
+      # link for swp13 --> Host04:eth2
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net51", auto_config: false , :mac => "443839000066"
+      
+      # link for swp14 --> Host04:eth3
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net33", auto_config: false , :mac => "443839000042"
+      
+      # link for swp44 --> Spine01:swp4
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net67", auto_config: false , :mac => "443839000085"
+      
+      # link for swp9 --> Host03:eth2
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net79", auto_config: false , :mac => "44383900009E"
+      
+      # link for swp43 --> Spine01:swp3
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net45", auto_config: false , :mac => "443839000059"
+      
+      # link for swp48 --> Leaf01:swp48
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net6", auto_config: false , :mac => "44383900000C"
+      
+      # link for swp2 --> Host01:eth3
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net18", auto_config: false , :mac => "443839000024"
+      
+      # link for eth0 --> OOB01:swp4
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net7", auto_config: false , :mac => "44383900000D"
+      
+      # link for swp6 --> Host02:eth3
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net76", auto_config: false , :mac => "443839000098"
+      
+      # link for swp46 --> Spine02:swp4
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net41", auto_config: false , :mac => "443839000051"
+      
+      # link for swp45 --> Spine02:swp3
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net53", auto_config: false , :mac => "443839000069"
+      
+      # link for swp5 --> Host02:eth2
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net37", auto_config: false , :mac => "44383900004A"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc8', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc9', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc10', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc11', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc12', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc13', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc14', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc15', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype6", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype7", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype8", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype9", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype10", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype11", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype12", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype13", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype14", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype15", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000084 swp1"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000072 swp10"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000066 swp13"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000042 swp14"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000085 swp44"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900009E swp9"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000059 swp43"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900000C swp48"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000024 swp2"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900000D eth0"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000098 swp6"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000051 swp46"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000069 swp45"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900004A swp5"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Leaf10 #####
+  config.vm.define "Leaf10" do |device|
+    device.vm.hostname = "Leaf10"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Leaf10"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp48 --> Leaf09:swp48
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net5", auto_config: false , :mac => "44383900000A"
+      
+      # link for swp43 --> Spine01:swp19
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net72", auto_config: false , :mac => "44383900008F"
+      
+      # link for swp44 --> Spine01:swp20
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net12", auto_config: false , :mac => "443839000017"
+      
+      # link for swp46 --> Spine02:swp20
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net56", auto_config: false , :mac => "44383900006F"
+      
+      # link for swp45 --> Spine02:swp19
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net31", auto_config: false , :mac => "44383900003D"
+      
+      # link for eth0 --> OOB01:swp12
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net44", auto_config: false , :mac => "443839000057"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype6", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype7", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900000A swp48"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900008F swp43"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000017 swp44"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900006F swp46"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900003D swp45"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000057 eth0"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Core02 #####
+  config.vm.define "Core02" do |device|
+    device.vm.hostname = "Core02"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Core02"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp48 --> Core01:swp48
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net59", auto_config: false , :mac => "443839000076"
+      
+      # link for swp02 --> Spine02:swp46
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net77", auto_config: false , :mac => "44383900009A"
+      
+      # link for swp01 --> Spine01:swp46
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net62", auto_config: false , :mac => "44383900007C"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000076 swp48"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900009A swp02"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900007C swp01"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Core01 #####
+  config.vm.define "Core01" do |device|
+    device.vm.hostname = "Core01"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Core01"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp48 --> Core02:swp48
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net59", auto_config: false , :mac => "443839000075"
+      
+      # link for swp02 --> Spine02:swp45
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net24", auto_config: false , :mac => "443839000030"
+      
+      # link for swp01 --> Spine01:swp45
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net61", auto_config: false , :mac => "44383900007A"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000075 swp48"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000030 swp02"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900007A swp01"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Leaf06 #####
+  config.vm.define "Leaf06" do |device|
+    device.vm.hostname = "Leaf06"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Leaf06"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp48 --> Leaf05:swp48
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net14", auto_config: false , :mac => "44383900001C"
+      
+      # link for swp43 --> Spine01:swp11
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net15", auto_config: false , :mac => "44383900001D"
+      
+      # link for swp44 --> Spine01:swp12
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net21", auto_config: false , :mac => "443839000029"
+      
+      # link for swp46 --> Spine02:swp12
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net22", auto_config: false , :mac => "44383900002B"
+      
+      # link for swp45 --> Spine02:swp11
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net13", auto_config: false , :mac => "443839000019"
+      
+      # link for eth0 --> OOB01:swp8
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net43", auto_config: false , :mac => "443839000055"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype6", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype7", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900001C swp48"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900001D swp43"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000029 swp44"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900002B swp46"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000019 swp45"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000055 eth0"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Leaf08 #####
+  config.vm.define "Leaf08" do |device|
+    device.vm.hostname = "Leaf08"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Leaf08"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp48 --> Leaf07:swp48
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net20", auto_config: false , :mac => "443839000028"
+      
+      # link for swp43 --> Spine01:swp15
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net26", auto_config: false , :mac => "443839000033"
+      
+      # link for eth0 --> OOB01:swp10
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net1", auto_config: false , :mac => "443839000001"
+      
+      # link for swp46 --> Spine02:swp16
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net39", auto_config: false , :mac => "44383900004D"
+      
+      # link for swp45 --> Spine02:swp15
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net19", auto_config: false , :mac => "443839000025"
+      
+      # link for swp44 --> Spine01:swp16
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net78", auto_config: false , :mac => "44383900009B"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype6", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype7", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000028 swp48"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000033 swp43"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000001 eth0"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900004D swp46"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000025 swp45"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900009B swp44"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Leaf09 #####
+  config.vm.define "Leaf09" do |device|
+    device.vm.hostname = "Leaf09"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Leaf09"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp48 --> Leaf10:swp48
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net5", auto_config: false , :mac => "443839000009"
+      
+      # link for swp43 --> Spine01:swp17
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net2", auto_config: false , :mac => "443839000003"
+      
+      # link for eth0 --> OOB01:swp11
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net30", auto_config: false , :mac => "44383900003B"
+      
+      # link for swp46 --> Spine02:swp18
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net50", auto_config: false , :mac => "443839000063"
+      
+      # link for swp45 --> Spine02:swp17
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net58", auto_config: false , :mac => "443839000073"
+      
+      # link for swp44 --> Spine01:swp18
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net70", auto_config: false , :mac => "44383900008B"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype6", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype7", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000009 swp48"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000003 swp43"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900003B eth0"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000063 swp46"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000073 swp45"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900008B swp44"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Spine02 #####
+  config.vm.define "Spine02" do |device|
+    device.vm.hostname = "Spine02"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Spine02"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp8 --> Leaf04:swp46
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net25", auto_config: false , :mac => "443839000032"
+      
+      # link for swp9 --> Leaf05:swp45
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net74", auto_config: false , :mac => "443839000094"
+      
+      # link for swp2 --> Leaf01:swp46
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net47", auto_config: false , :mac => "44383900005E"
+      
+      # link for swp3 --> Leaf02:swp45
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net53", auto_config: false , :mac => "44383900006A"
+      
+      # link for swp1 --> Leaf01:swp45
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net28", auto_config: false , :mac => "443839000038"
+      
+      # link for swp6 --> Leaf03:swp46
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net3", auto_config: false , :mac => "443839000006"
+      
+      # link for swp7 --> Leaf04:swp45
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net75", auto_config: false , :mac => "443839000096"
+      
+      # link for swp4 --> Leaf02:swp46
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net41", auto_config: false , :mac => "443839000052"
+      
+      # link for eth0 --> OOB01:swp2
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net64", auto_config: false , :mac => "44383900007F"
+      
+      # link for swp18 --> Leaf09:swp46
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net50", auto_config: false , :mac => "443839000064"
+      
+      # link for swp19 --> Leaf10:swp45
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net31", auto_config: false , :mac => "44383900003E"
+      
+      # link for swp10 --> Leaf05:swp46
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net60", auto_config: false , :mac => "443839000078"
+      
+      # link for swp11 --> Leaf06:swp45
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net13", auto_config: false , :mac => "44383900001A"
+      
+      # link for swp12 --> Leaf06:swp46
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net22", auto_config: false , :mac => "44383900002C"
+      
+      # link for swp13 --> Leaf07:swp45
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net40", auto_config: false , :mac => "443839000050"
+      
+      # link for swp14 --> Leaf07:swp46
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net42", auto_config: false , :mac => "443839000054"
+      
+      # link for swp15 --> Leaf08:swp45
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net19", auto_config: false , :mac => "443839000026"
+      
+      # link for swp16 --> Leaf08:swp46
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net39", auto_config: false , :mac => "44383900004E"
+      
+      # link for swp17 --> Leaf09:swp45
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net58", auto_config: false , :mac => "443839000074"
+      
+      # link for swp5 --> Leaf03:swp45
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net10", auto_config: false , :mac => "443839000014"
+      
+      # link for swp20 --> Leaf10:swp46
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net56", auto_config: false , :mac => "443839000070"
+      
+      # link for swp48 --> Spine01:swp48
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net54", auto_config: false , :mac => "44383900006C"
+      
+      # link for swp46 --> Core02:swp02
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net77", auto_config: false , :mac => "443839000099"
+      
+      # link for swp45 --> Core01:swp02
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net24", auto_config: false , :mac => "44383900002F"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc8', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc9', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc10', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc11', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc12', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc13', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc14', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc15', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc16', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc17', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc18', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc19', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc20', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc21', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc22', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc23', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc24', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc25', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype6", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype7", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype8", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype9", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype10", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype11", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype12", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype13", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype14", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype15", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype16", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype17", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype18", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype19", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype20", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype21", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype22", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype23", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype24", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype25", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000032 swp8"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000094 swp9"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900005E swp2"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900006A swp3"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000038 swp1"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000006 swp6"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000096 swp7"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000052 swp4"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900007F eth0"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000064 swp18"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900003E swp19"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000078 swp10"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900001A swp11"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900002C swp12"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000050 swp13"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000054 swp14"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000026 swp15"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900004E swp16"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000074 swp17"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000014 swp5"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000070 swp20"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900006C swp48"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000099 swp46"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900002F swp45"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Spine01 #####
+  config.vm.define "Spine01" do |device|
+    device.vm.hostname = "Spine01"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Spine01"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp8 --> Leaf04:swp44
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net68", auto_config: false , :mac => "443839000088"
+      
+      # link for swp9 --> Leaf05:swp43
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net46", auto_config: false , :mac => "44383900005C"
+      
+      # link for swp2 --> Leaf01:swp44
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net71", auto_config: false , :mac => "44383900008E"
+      
+      # link for swp3 --> Leaf02:swp43
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net45", auto_config: false , :mac => "44383900005A"
+      
+      # link for swp1 --> Leaf01:swp43
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net49", auto_config: false , :mac => "443839000062"
+      
+      # link for swp6 --> Leaf03:swp44
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net16", auto_config: false , :mac => "443839000020"
+      
+      # link for swp7 --> Leaf04:swp43
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net17", auto_config: false , :mac => "443839000022"
+      
+      # link for swp4 --> Leaf02:swp44
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net67", auto_config: false , :mac => "443839000086"
+      
+      # link for eth0 --> OOB01:swp1
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net35", auto_config: false , :mac => "443839000045"
+      
+      # link for swp18 --> Leaf09:swp44
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net70", auto_config: false , :mac => "44383900008C"
+      
+      # link for swp19 --> Leaf10:swp43
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net72", auto_config: false , :mac => "443839000090"
+      
+      # link for swp10 --> Leaf05:swp44
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net73", auto_config: false , :mac => "443839000092"
+      
+      # link for swp11 --> Leaf06:swp43
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net15", auto_config: false , :mac => "44383900001E"
+      
+      # link for swp12 --> Leaf06:swp44
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net21", auto_config: false , :mac => "44383900002A"
+      
+      # link for swp13 --> Leaf07:swp43
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net4", auto_config: false , :mac => "443839000008"
+      
+      # link for swp14 --> Leaf07:swp44
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net34", auto_config: false , :mac => "443839000044"
+      
+      # link for swp15 --> Leaf08:swp43
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net26", auto_config: false , :mac => "443839000034"
+      
+      # link for swp16 --> Leaf08:swp44
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net78", auto_config: false , :mac => "44383900009C"
+      
+      # link for swp17 --> Leaf09:swp43
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net2", auto_config: false , :mac => "443839000004"
+      
+      # link for swp5 --> Leaf03:swp43
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net27", auto_config: false , :mac => "443839000036"
+      
+      # link for swp20 --> Leaf10:swp44
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net12", auto_config: false , :mac => "443839000018"
+      
+      # link for swp48 --> Spine02:swp48
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net54", auto_config: false , :mac => "44383900006B"
+      
+      # link for swp46 --> Core02:swp01
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net62", auto_config: false , :mac => "44383900007B"
+      
+      # link for swp45 --> Core01:swp01
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net61", auto_config: false , :mac => "443839000079"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc8', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc9', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc10', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc11', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc12', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc13', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc14', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc15', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc16', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc17', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc18', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc19', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc20', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc21', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc22', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc23', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc24', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc25', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype6", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype7", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype8", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype9", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype10", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype11", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype12", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype13", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype14", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype15", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype16", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype17", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype18", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype19", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype20", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype21", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype22", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype23", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype24", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype25", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000088 swp8"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900005C swp9"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900008E swp2"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900005A swp3"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000062 swp1"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000020 swp6"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000022 swp7"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000086 swp4"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000045 eth0"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900008C swp18"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000090 swp19"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000092 swp10"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900001E swp11"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900002A swp12"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000008 swp13"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000044 swp14"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000034 swp15"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900009C swp16"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000004 swp17"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000036 swp5"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000018 swp20"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900006B swp48"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900007B swp46"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000079 swp45"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Leaf01 #####
+  config.vm.define "Leaf01" do |device|
+    device.vm.hostname = "Leaf01"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Leaf01"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp1 --> Host01:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net48", auto_config: false , :mac => "443839000060"
+      
+      # link for swp10 --> Host03:eth1
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net8", auto_config: false , :mac => "443839000010"
+      
+      # link for swp13 --> Host04:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net38", auto_config: false , :mac => "44383900004C"
+      
+      # link for swp14 --> Host04:eth1
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net69", auto_config: false , :mac => "44383900008A"
+      
+      # link for swp44 --> Spine01:swp2
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net71", auto_config: false , :mac => "44383900008D"
+      
+      # link for swp9 --> Host03:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net63", auto_config: false , :mac => "44383900007E"
+      
+      # link for swp43 --> Spine01:swp1
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net49", auto_config: false , :mac => "443839000061"
+      
+      # link for swp48 --> Leaf02:swp48
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net6", auto_config: false , :mac => "44383900000B"
+      
+      # link for swp2 --> Host01:eth1
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net23", auto_config: false , :mac => "44383900002E"
+      
+      # link for swp5 --> Host02:eth0
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net11", auto_config: false , :mac => "443839000016"
+      
+      # link for swp6 --> Host02:eth1
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net65", auto_config: false , :mac => "443839000082"
+      
+      # link for swp46 --> Spine02:swp2
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net47", auto_config: false , :mac => "44383900005D"
+      
+      # link for swp45 --> Spine02:swp1
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net28", auto_config: false , :mac => "443839000037"
+      
+      # link for eth0 --> OOB01:swp3
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net36", auto_config: false , :mac => "443839000047"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc8', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc9', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc10', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc11', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc12', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc13', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc14', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc15', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype6", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype7", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype8", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype9", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype10", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype11", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype12", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype13", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype14", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype15", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000060 swp1"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000010 swp10"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900004C swp13"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900008A swp14"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900008D swp44"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900007E swp9"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000061 swp43"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900000B swp48"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900002E swp2"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000016 swp5"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000082 swp6"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900005D swp46"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000037 swp45"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000047 eth0"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Leaf03 #####
+  config.vm.define "Leaf03" do |device|
+    device.vm.hostname = "Leaf03"
+    device.vm.box = "CumulusCommunity/cumulus-vx"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Leaf03"
+      v.memory = 300
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # link for swp48 --> Leaf04:swp48
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net29", auto_config: false , :mac => "443839000039"
+      
+      # link for swp43 --> Spine01:swp5
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net27", auto_config: false , :mac => "443839000035"
+      
+      # link for swp44 --> Spine01:swp6
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net16", auto_config: false , :mac => "44383900001F"
+      
+      # link for swp46 --> Spine02:swp6
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net3", auto_config: false , :mac => "443839000005"
+      
+      # link for swp45 --> Spine02:swp5
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net10", auto_config: false , :mac => "443839000013"
+      
+      # link for eth0 --> OOB01:swp5
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net32", auto_config: false , :mac => "44383900003F"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc6', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc7', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype6", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype7", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_switch_config.sh"
+
+
+
+      # Apply the interface re-map
+        #Disable default remap on Cumulus VX 
+      device.vm.provision :shell , inline: "mv /etc/init.d/rename_eth_swp /etc/init.d/rename_eth_swp.old"
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000039 swp48"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000035 swp43"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900001F swp44"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000005 swp46"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000013 swp45"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900003F eth0"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Host01 #####
+  config.vm.define "Host01" do |device|
+    device.vm.hostname = "Host01"
+    device.vm.box = "boxcutter/ubuntu1404"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Host01"
+      v.memory = 400
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+      # UBUNTU DEVICES ONLY: Shorten Boot Process - remove \"Wait for Network
+      device.vm.provision :shell , inline: "sed -i 's/sleep [0-9]*/sleep 1/' /etc/init/failsafe.conf"
+
+      # link for eth3 --> Leaf02:swp2
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net18", auto_config: false , :mac => "443839000023"
+      
+      # link for eth2 --> Leaf02:swp1
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net66", auto_config: false , :mac => "443839000083"
+      
+      # link for eth1 --> Leaf01:swp2
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net23", auto_config: false , :mac => "44383900002D"
+      
+      # link for eth0 --> Leaf01:swp1
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net48", auto_config: false , :mac => "44383900005F"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_server_config.sh"
+
+
+
+      # Apply the interface re-map
+
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000023 eth3"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000083 eth2"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900002D eth1"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900005F eth0"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Host02 #####
+  config.vm.define "Host02" do |device|
+    device.vm.hostname = "Host02"
+    device.vm.box = "boxcutter/ubuntu1404"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Host02"
+      v.memory = 400
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+      # UBUNTU DEVICES ONLY: Shorten Boot Process - remove \"Wait for Network
+      device.vm.provision :shell , inline: "sed -i 's/sleep [0-9]*/sleep 1/' /etc/init/failsafe.conf"
+
+      # link for eth3 --> Leaf02:swp6
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net76", auto_config: false , :mac => "443839000097"
+      
+      # link for eth2 --> Leaf02:swp5
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net37", auto_config: false , :mac => "443839000049"
+      
+      # link for eth1 --> Leaf01:swp6
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net65", auto_config: false , :mac => "443839000081"
+      
+      # link for eth0 --> Leaf01:swp5
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net11", auto_config: false , :mac => "443839000015"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_server_config.sh"
+
+
+
+      # Apply the interface re-map
+
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000097 eth3"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000049 eth2"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000081 eth1"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000015 eth0"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Host03 #####
+  config.vm.define "Host03" do |device|
+    device.vm.hostname = "Host03"
+    device.vm.box = "boxcutter/ubuntu1404"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Host03"
+      v.memory = 400
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+      # UBUNTU DEVICES ONLY: Shorten Boot Process - remove \"Wait for Network
+      device.vm.provision :shell , inline: "sed -i 's/sleep [0-9]*/sleep 1/' /etc/init/failsafe.conf"
+
+      # link for eth3 --> Leaf02:swp10
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net57", auto_config: false , :mac => "443839000071"
+      
+      # link for eth2 --> Leaf02:swp9
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net79", auto_config: false , :mac => "44383900009D"
+      
+      # link for eth1 --> Leaf01:swp10
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net8", auto_config: false , :mac => "44383900000F"
+      
+      # link for eth0 --> Leaf01:swp9
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net63", auto_config: false , :mac => "44383900007D"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_server_config.sh"
+
+
+
+      # Apply the interface re-map
+
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000071 eth3"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900009D eth2"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900000F eth1"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900007D eth0"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+  ##### DEFINE VM for Host04 #####
+  config.vm.define "Host04" do |device|
+    device.vm.hostname = "Host04"
+    device.vm.box = "boxcutter/ubuntu1404"
+    device.vm.provider "virtualbox" do |v|
+      v.name = "1463114200_Host04"
+      v.memory = 400
+    end
+    device.vm.synced_folder ".", "/vagrant", disabled: true
+      # UBUNTU DEVICES ONLY: Shorten Boot Process - remove \"Wait for Network
+      device.vm.provision :shell , inline: "sed -i 's/sleep [0-9]*/sleep 1/' /etc/init/failsafe.conf"
+
+      # link for eth3 --> Leaf02:swp14
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net33", auto_config: false , :mac => "443839000041"
+      
+      # link for eth2 --> Leaf02:swp13
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net51", auto_config: false , :mac => "443839000065"
+      
+      # link for eth1 --> Leaf01:swp14
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net69", auto_config: false , :mac => "443839000089"
+      
+      # link for eth0 --> Leaf01:swp13
+      device.vm.network "private_network", virtualbox__intnet: "{wbid}_net38", auto_config: false , :mac => "44383900004B"
+      
+
+    device.vm.provider "virtualbox" do |vbox|
+      vbox.customize ['modifyvm', :id, '--nicpromisc2', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc3', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc4', 'allow-vms']
+      vbox.customize ['modifyvm', :id, '--nicpromisc5', 'allow-vms']
+
+      vbox.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype3", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype4", "virtio"]
+      vbox.customize ["modifyvm", :id, "--nictype5", "virtio"]
+
+    end
+
+      # Fixes "stdin: is not a tty" message --> https://github.com/mitchellh/vagrant/issues/1673
+      device.vm.provision :shell , inline: "(grep -q -E '^mesg n$' /root/.profile && sed -i 's/^mesg n$/tty -s \\&\\& mesg n/g' /root/.profile && echo 'Ignore the previous error \"stdin: is not a tty\" -- fixing this now...') || exit 0;"
+
+      # Run Any Extra Config
+      device.vm.provision :shell , path: "./helper_scripts/extra_server_config.sh"
+
+
+
+      # Apply the interface re-map
+
+      device.vm.provision "file", source: "./helper_scripts/apply_udev.py", destination: "/home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "chmod 755 /home/vagrant/apply_udev.py"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000041 eth3"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000065 eth2"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 443839000089 eth1"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -a 44383900004B eth0"
+
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -vm"
+      device.vm.provision :shell , inline: "/home/vagrant/apply_udev.py -s"
+      device.vm.provision :shell , inline: "reboot"
+
+
+
+
+  end
+
+
+
+end
