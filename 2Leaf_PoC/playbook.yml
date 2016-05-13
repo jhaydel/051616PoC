@@ -1,12 +1,8 @@
 ---        
 - hosts: localhost
-  user: cumulus
-  become: yes
   roles:
     - localhost
     
 - hosts: network
-  user: cumulus
-  become: yes
   roles:
     - common
