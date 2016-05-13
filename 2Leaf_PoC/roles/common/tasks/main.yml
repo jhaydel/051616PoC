@@ -22,22 +22,6 @@
   service: name=quagga state=restarted
   when: '"Cumulus" in ansible_lsb.id'
 
-- name: Force Interfaces Down
-  command: ifdown {{item}}
-  with_items:
-    - lo
-    - eth1
-    - eth2
-  when: '"Cumulus" not in ansible_lsb.id'
-    
-- name: Force Interfaces Up
-  command: ifup {{item}}
-  with_items:
-    - lo
-    - eth1
-    - eth2
-  when: '"Cumulus" not in ansible_lsb.id'
-
 - name: Check if mgmtvrf is installed
   shell: "dpkg-query -f '${binary:Package}\n' -W"
   register: mgmtvrf_installed
@@ -56,39 +40,3 @@
 - name: Setup Mgmtvrf
   command: cl-mgmtvrf -e
   when: '"Cumulus" in ansible_lsb.id and mgmtvrf.stat.exists == False' 
-
-- name: Check if default for eth1/eth2 is installed
-  shell: "ip route show"
-  register: default_installed
-  when: "'server' in ansible_hostname"
-
-- name: Delete the default if the eth0 default is still there
-  shell: "ip route del default"
-  when: "'server' in ansible_hostname and 'default via 192.168.0.254' in default_installed.stdout"    
-     
-- name: Add Default route if on server01
-  lineinfile: dest=/etc/rc.local line="ip route add default nexthop via 172.16.1.1 dev eth1 onlink nexthop via 172.16.1.1 dev eth2 onlink" insertbefore="exit 0"
-  when: "'server01' in ansible_hostname and 'nexthop via 172.16.1.1' not in default_installed.stdout"
- 
-- name: make sure default is present on server01
-  command: ip route add default nexthop via 172.16.1.1 dev eth1 onlink nexthop via 172.16.1.1 dev eth2 onlink
-  when: "'server01' in ansible_hostname and 'nexthop via 172.16.1.1' not in default_installed.stdout"
-     
-- name: Add Default route if on server03
-  lineinfile: dest=/etc/rc.local line="ip route add default nexthop via 172.16.3.1 dev eth1 onlink nexthop via 172.16.3.1 dev eth2 onlink" insertbefore="exit 0"
-  when: "'server03' in ansible_hostname and 'nexthop via 172.16.3.1' not in default_installed.stdout"
- 
-- name: make sure default is present on server03
-  command: ip route add default nexthop via 172.16.3.1 dev eth1 onlink nexthop via 172.16.3.1 dev eth2 onlink
-  when: "'server03' in ansible_hostname and 'nexthop via 172.16.3.1' not in default_installed.stdout"
-
-- name: Enable NAT on Vagrant interface for Downstream Hosts
-  shell: "{{ item }}"
-  with_items:
-    - "iptables --flush -t nat"
-    - "iptables -t nat -A POSTROUTING -o swp48 -j MASQUERADE"
-  when: "'internet' in ansible_hostname"
-  
-  
-  
-  

@@ -1,15 +1,15 @@
-- name: Make sure internet is in /etc/hosts
-  lineinfile: dest=/etc/hosts line="192.168.0.253 internet.lab.local internet"  insertafter=EOF
+- name: make sure internet is in /etc/hosts
+  lineinfile: dest=/etc/hosts line="192.168.0.253 internet.lab.local internet" insertafter=EOF
 
-- name: Do not allow dhcp to send out a default route for anyone
+- name: do not allow dhcp to send out a default route for anyone
   lineinfile: dest=/etc/dhcp/dhcpd.pools line="#option routers 192.168.0.254;" regexp="^option routers"
   delegate_to: localhost
 
-- name: Restart isc-dhcp-server
+- name: restart isc-dhcp-server
   service: name=isc-dhcp-server state=restarted pattern=/var/run/dhcp-server/dhcpd.pid
   delegate_to: localhost
 
-- name: Verify isc-dhcp-server is running
+- name: verify isc-dhcp-server is running
   service: name=isc-dhcp-server state=started pattern=/var/run/dhcp-server/dhcpd.pi
   delegate_to: localhost  
   
@@ -23,7 +23,7 @@
   service: name=apt-cacher-ng state=restarted pattern=/var/run/apt-cacher-ng/pid
   delegate_to: localhost
 
-- name: Verify apt-cacher is running
+- name: verify apt-cacher is running
   service: name=apt-cacher-ng state=started pattern=/var/run/apt-cacher-ng/pid
   delegate_to: localhost
   
