@@ -5,6 +5,58 @@ iface lo inet loopback
 auto eth0
 iface eth0 inet dhcp
 
+auto swp1
+iface swp1
+  post-up ip link set $IFACE promisc on
+
+auto swp2
+iface swp2
+  post-up ip link set $IFACE promisc on
+
+auto swp5
+iface swp5
+  post-up ip link set $IFACE promisc on
+  
+auto swp6
+iface swp6
+  post-up ip link set $IFACE promisc on
+  
+auto swp09
+iface swp09
+  post-up ip link set $IFACE promisc on
+  
+auto swp10
+iface swp10
+  post-up ip link set $IFACE promisc on
+
+auto swp13
+iface swp13
+  post-up ip link set $IFACE promisc on
+
+auto swp14
+iface swp14
+  post-up ip link set $IFACE promisc on
+            
+auto swp43
+iface swp43
+  post-up ip link set $IFACE promisc on
+
+auto swp44
+iface swp44
+  post-up ip link set $IFACE promisc on
+
+auto swp45
+iface swp45
+  post-up ip link set $IFACE promisc on
+  
+auto swp46
+iface swp46
+  post-up ip link set $IFACE promisc on
+ 
+auto swp48
+iface swp48
+  post-up ip link set $IFACE promisc on
+      
 auto bridge
 iface bridge
   bridge-ports spinebond peerlink hostbond1 hostbond2 hostbond3
@@ -60,7 +112,7 @@ iface hostbond1
   
 auto hostbond2
 iface hostbond2
-  bond-slaves swp5 swp7
+  bond-slaves swp5 swp5
   bond-miimon 100
   bond-use-carrier 1
   bond-xmit-hash-policy layer3+4
@@ -76,4 +128,14 @@ iface hostbond3
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1
   bond-min-links 1  
-  clag-id 4   
+  clag-id 4 
+  
+auto hostbond4
+iface hostbond4
+  bond-slaves swp13 swp14
+  bond-miimon 100
+  bond-use-carrier 1
+  bond-xmit-hash-policy layer3+4
+  bond-lacp-rate 1
+  bond-min-links 1  
+  clag-id 5     
