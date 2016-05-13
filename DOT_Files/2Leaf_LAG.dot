@@ -15,7 +15,7 @@ graph dc1 {
  "Host03" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
  "Host04" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
 
- "OOB01" [function="oob" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
+ "OOB01" [function="oob" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/OOB_Switch_Config.sh"]
  "oob-mgmt-server" [function="oob-server" os="boxcutter/ubuntu1404" memory="400" ubuntu=True config="./helper_scripts/OOB_Mgmt_Config.sh"]
 
    "Core01":"swp48" -- "Core02":"swp48"

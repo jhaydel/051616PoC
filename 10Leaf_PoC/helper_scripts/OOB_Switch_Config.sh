@@ -21,7 +21,7 @@ echo -e "iface swp\${i}" >> /etc/network/interfaces
 echo -e "% endfor\n" >> /etc/network/interfaces
 echo -e "auto bridge" >> /etc/network/interfaces
 echo -e "iface bridge" >> /etc/network/interfaces
-echo -e "address 192.168.252.1/24" >> /etc/network/interfaces
+echo -e "address 10.2.0.250/24" >> /etc/network/interfaces
 echo -e "bridge-ports glob swp1-48" >> /etc/network/interfaces
 echo -e "bridge-stp on" >> /etc/network/interfaces
 
