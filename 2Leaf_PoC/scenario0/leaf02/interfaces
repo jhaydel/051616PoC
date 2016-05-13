@@ -21,8 +21,8 @@ auto swp6
 iface swp6
   post-up ip link set $IFACE promisc on
   
-auto swp09
-iface swp09
+auto swp9
+iface swp9
   post-up ip link set $IFACE promisc on
   
 auto swp10
@@ -112,7 +112,7 @@ iface hostbond1
   
 auto hostbond2
 iface hostbond2
-  bond-slaves swp5 swp7
+  bond-slaves swp5 swp6
   bond-miimon 100
   bond-use-carrier 1
   bond-xmit-hash-policy layer3+4

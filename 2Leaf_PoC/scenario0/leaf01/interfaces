@@ -112,7 +112,7 @@ iface hostbond1
   
 auto hostbond2
 iface hostbond2
-  bond-slaves swp5 swp5
+  bond-slaves swp5 swp6
   bond-miimon 100
   bond-use-carrier 1
   bond-xmit-hash-policy layer3+4
