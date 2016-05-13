@@ -1,0 +1,14 @@
+.vagrant
+
+/Vagrant/.vagrant/*
+
+*.vagrant
+
+.vagrant/
+
+vagrant/.vagrant/
+vagrant/.vagrant/machines/e1/virtualbox/action_provision
+
+vagrant/.vagrant/machines/e1/virtualbox/action_provision
+
+vagrant/.vagrant/machines/e1/virtualbox/action_provision
