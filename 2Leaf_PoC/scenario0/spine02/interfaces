@@ -21,11 +21,15 @@ auto swp32s2
 iface swp32s2
   post-up ip link set $IFACE promisc on
 
-auto swp32s2
-iface swp32s2
+auto swp32s3
+iface swp32s3
   post-up ip link set $IFACE promisc on
 
 auto swp20
+iface swp20
+  post-up ip link set $IFACE promisc on
+
+auto swp21
 iface swp21
   post-up ip link set $IFACE promisc on
  
