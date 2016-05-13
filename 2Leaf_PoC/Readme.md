@@ -1,22 +1,75 @@
 Jeff Haydel and Sean Cavanaugh's Demo
 ===================
-Preface
-------
+#Preface
 - Use the Cumulus Linux Cheat Sheet as a reference:
 https://community.cumulusnetworks.com/cumulus/topics/cumulus-linux-cheat-sheets
 
 - Refresh on BGP Unnumbered
 https://docs.cumulusnetworks.com/display/DOCS/Configuring+Border+Gateway+Protocol+-+BGP#ConfiguringBorderGatewayProtocol-BGP-unnumberedUsingBGPUnnumberedInterfaces
 
-Vagrant Setup
-------
-- Turn up the vagrant topology
-```~$ vagrant up```
-- ssh to the oob-mgmt-server
-```~$ vagrant ssh oob-mgmt-server```
+#Install Instructions
+These steps will walk you through setting up your vagrant simulation environment 
 
-Ansible Setup on oob-mgmt-server
+#Setting up Laptop Environment
+
+Clone this git repo to the laptop or server being used to run vagrant
+```bash
+$ git clone https://github.com/jhaydel/051616PoC.git
+```
+- The following must also be installed:
+    - Virtualbox installed: https://www.virtualbox.org/wiki/Downloads 
+    - Vagrant(v1.7+) installed: http://www.vagrantup.com/downloads 
+    - Cumulus Plugin for Vagrant installed: 
+    ```bash
+    $ vagrant plugin install vagrant-cumulus 
+    ```
+
+- cd into the github directory on your laptop/server which was cloned, then into the Vagrant sub-directory
+```bash
+cd ~/051616PoC/Vagrant
+```
+
+- turn on the mgmt vm and the layer 2 oob switch connected to it
+```bash
+$ vagrant up oob-mgmt-server oob-mgmt-switch
+```
+
+- use the vagrant ssh mgmt command to connect to the mgmt vm
+```bash
+$ vagrant ssh oob-mgmt-server
+Welcome to Ubuntu 14.04.4 LTS (GNU/Linux 4.2.0-27-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+----------------------------------------------------------------
+  Ubuntu 14.04.4 LTS                          built 2016-02-20
+----------------------------------------------------------------
+Last login: Mon Mar  7 12:29:28 2016 from 10.0.2.2
+vagrant@oob-mgmt-server:~$
+```
+#turnup.sh  Script
+There is an optional script that will take care of the first 3 steps automatically
+```bash
+$ vagrant ssh oob-mgmt-server
+Welcome to Ubuntu 14.04.4 LTS (GNU/Linux 4.2.0-27-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+----------------------------------------------------------------
+  Ubuntu 14.04.4 LTS                          built 2016-02-20
+----------------------------------------------------------------
+Last login: Tue Mar  8 17:21:42 2016 from 10.0.2.2
+vagrant@oob-mgmt-server:~$ sudo -i
+root@oob-mgmt-server:~# cd /home/vagrant/
+root@oob-mgmt-server:/home/vagrant# sh turnup.sh
+```
+
+- turn on the rest of the VMs from the laptop/server
+```bash
+$ vagrant up 
+```
+
+#Ansible Setup on oob-mgmt-server
 ------
+This should be installed by default, but here is the directions for installing latest stable Ansible
 - Install the software-properties-common package
 ```~$ sudo apt-get install software-properties-common -qy```
 - Add the ansible repository 
