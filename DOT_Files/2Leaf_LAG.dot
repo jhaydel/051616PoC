@@ -16,6 +16,7 @@ graph dc1 {
  "Host04" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
 
  "OOB01" [function="oob" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_switch_config.sh"]
+ "oob-mgmt-server" [function="oob-server" os="boxcutter/ubuntu1404" memory="400" ubuntu=True config="./helper_scripts/OOB_Mgmt_Config.sh"]
 
    "Core01":"swp48" -- "Core02":"swp48"
 
@@ -65,4 +66,14 @@ graph dc1 {
    "Host04":"eth1" -- "Leaf01":"swp14"
    "Host04":"eth2" -- "Leaf02":"swp13"
    "Host04":"eth3" -- "Leaf02":"swp14"
+   
+   "oob-mgmt-server":"eth1" -- "OOB01":"swp5"
+   "OOB01":"swp6" -- "Core01":"eth0"
+   "OOB01":"swp7" -- "Core02":"eth0"
+   "OOB01":"swp8" -- "Host01":"eth4"
+   "OOB01":"swp9" -- "Host02":"eth4"
+   "OOB01":"swp10" -- "Host03":"eth4"
+   "OOB01":"swp11" -- "Host04":"eth4"
+  
+   
 }
