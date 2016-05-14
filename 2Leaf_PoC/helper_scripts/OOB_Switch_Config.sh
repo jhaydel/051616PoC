@@ -14,13 +14,13 @@ echo -e "auto lo" >> /etc/network/interfaces
 echo -e "iface lo inet loopback\n" >> /etc/network/interfaces
 echo -e "auto eth0" >> /etc/network/interfaces
 echo -e "iface eth0\n" >> /etc/network/interfaces
-echo -e "% for i in range(1, 9):" >> /etc/network/interfaces
+echo -e "% for i in range(1, 21):" >> /etc/network/interfaces
 echo -e "auto swp\${i}" >> /etc/network/interfaces
 echo -e "iface swp\${i}" >> /etc/network/interfaces
 echo -e "% endfor\n" >> /etc/network/interfaces
 echo -e "auto bridge" >> /etc/network/interfaces
 echo -e "iface bridge" >> /etc/network/interfaces
-echo -e "bridge-ports glob swp1-8" >> /etc/network/interfaces
+echo -e "bridge-ports glob swp1-20" >> /etc/network/interfaces
 echo -e "bridge-stp on" >> /etc/network/interfaces
 echo -e "ip address 10.2.0.250/24" >> /etc/network/interfaces
 echo -e "\n\nauto vagrant" >> /etc/network/interfaces
