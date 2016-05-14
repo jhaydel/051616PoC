@@ -73,31 +73,34 @@ This should be installed by default, but here is the directions for installing l
 
 #Setup SSH keys and deploy to the network
 ```bash
-root@oob-mgmt-server:~/phonecom# ssh-keygen -t rsa
-root@oob-mgmt-server:~/phonecom# cp /root/.ssh/id_rsa.pub /var/www/html/authorized_keys
-root@oob-mgmt-server:~/phonecom# cp ~/CUSTOMER/var/www/ztp_deploy.sh /var/www/html/
-root@oob-mgmt-server:~/phonecom# ansible-playbook deploy_ssh_keys.yml -u vagrant -k
+vagrant@oob-mgmt-server:~/phonecom# sudo ansible-playbook deploy_ssh_keys.yml -u vagrant -k
   - (pwd: vagrant)
 ```
 
 Run MLAG Scenario 
 ------
-Load Scenario1 into vagrant topology
+Load Scenario0 into vagrant topology
 ```vagrant@oob-mgmt-server:~$ cd /home/vagrant/051616PoC/2Leaf_PoC```
-```vagrant@oob-mgmt-server:~$ ansible-playbook playbook.yml -e "s=1"```
+```vagrant@oob-mgmt-server:~$ sudo ansible-playbook playbook.yml -e "s=0"```
+
+Run the Layer 3 (BGP unnumbered/VxLAN) Scenario
+------
+Load Scenario1 into vagrant topology
+```vagrant@oob-mgmt-server:~$ sudo ansible-playbook playbook.yml -e "s=1"```
+
 
 IP Address Schema
 ------
 | Device|eth0|lo|VLAN 10|
-| :--------------- | :-------------: | :-------------: | :-------------: |
-| Core01 | 10.2.0.81/24 | 10.2.0.81/32 |10.10.0.81/32 |
-| Core02    | 10.2.0.82/24   |  10.0.0.82/32 |10.10.0.82/32 |
-| Spine01     | 10.2.0.51/24|  10.0.0.51/32  |10.10.0.51/32  |
-| Spine02     | 10.2.0.52/24|  10.0.0.52/32  |10.10.0.52/32  |
-| Leaf01     | 10.2.0.11/24    |  10.0.0.11/32 |10.10.0.11/32 |
-| Leaf02     | 10.2.0.12/24   |  10.0.0.12/32  |10.10.0.12/32  |
-| Host01     | 10.2.0.101/24    |  10.0.0.101/32  |10.10.0.101/32  |
-| Host02     | 10.2.0.102/24    |  10.0.0.102/32  |10.10.0.102/32  |
-| Host03     | 10.2.0.103/24    |  10.0.0.103/32  |10.10.0.103/32  |
-| Host04     | 10.2.0.104/24    |  10.0.0.104/32  |10.10.0.104/32  |
-| oob-mgmt-server     | 10.2.0.254/24    |  10.0.0.254/32  | N/A |
+| :--------------- | :-----------: | :-------------: | :-----------: |
+| Core01           | 10.2.0.81/24  |  10.2.0.81/32   |10.10.0.81/32  |
+| Core02           | 10.2.0.82/24  |  10.0.0.82/32   |10.10.0.82/32  |
+| Spine01          | 10.2.0.51/24  |  10.0.0.51/32   |10.10.0.51/32  |
+| Spine02          | 10.2.0.52/24  |  10.0.0.52/32   |10.10.0.52/32  |
+| Leaf01           | 10.2.0.11/24  |  10.0.0.11/32   |10.10.0.11/32  |
+| Leaf02           | 10.2.0.12/24  |  10.0.0.12/32   |10.10.0.12/32  |
+| Host01           | 10.2.0.101/24 |  10.0.0.101/32  |10.10.0.101/32 |
+| Host02           | 10.2.0.102/24 |  10.0.0.102/32  |10.10.0.102/32 |
+| Host03           | 10.2.0.103/24 |  10.0.0.103/32  |10.10.0.103/32 |
+| Host04           | 10.2.0.104/24 |  10.0.0.104/32  |10.10.0.104/32 |
+| oob-mgmt-server  | 10.2.0.254/24 |  10.0.0.254/32  | N/A   |

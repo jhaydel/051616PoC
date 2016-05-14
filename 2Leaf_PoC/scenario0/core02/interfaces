@@ -48,7 +48,7 @@ iface peerlink.4094
   
 auto cumulusbond
 iface cumulusbond
-  bond-slaves swp20 swp21
+  bond-slaves swp1 swp2
   bond-miimon 100
   bond-use-carrier 1
   bond-xmit-hash-policy layer3+4
