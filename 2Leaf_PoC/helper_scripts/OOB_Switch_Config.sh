@@ -14,7 +14,7 @@ echo -e "auto lo" >> /etc/network/interfaces
 echo -e "iface lo inet loopback\n" >> /etc/network/interfaces
 echo -e "auto eth0" >> /etc/network/interfaces
 echo -e "iface eth0\n" >> /etc/network/interfaces
-echo -e "% for i in range(1, 20):" >> /etc/network/interfaces
+echo -e "% for i in range(1, 21):" >> /etc/network/interfaces
 echo -e "auto swp\${i}" >> /etc/network/interfaces
 echo -e "iface swp\${i}" >> /etc/network/interfaces
 echo -e "% endfor\n" >> /etc/network/interfaces
