@@ -1,0 +1,42 @@
+#- name: print ansible_lsb.id result
+#  debug: var=ansible_lsb.id
+- name: Set proxy to oob-mgmt-server
+  lineinfile: dest=/etc/apt/apt.conf.d/69apt-proxy line='Acquire::http::Proxy "http://10.2.0.254:3142";' create=yes
+  
+- name: copy interfaces
+  copy: src=scenario{{s}}/{{ansible_hostname}}/interfaces dest=/etc/network/
+  
+- name: copy Quagga daemons
+  copy: src=scenario{{s}}/{{ansible_hostname}}/daemons dest=/etc/quagga/
+  when: '"Cumulus" in ansible_lsb.id'
+  
+- name: copy Quagga conf
+  copy: src=scenario{{s}}/{{ansible_hostname}}/Quagga.conf dest=/etc/quagga/
+  when: '"Cumulus" in ansible_lsb.id'
+
+- name: reload networking
+  command: ifreload -a
+  when: '"Cumulus" in ansible_lsb.id'
+
+- name: reload quagga
+  service: name=quagga state=restarted
+  when: '"Cumulus" in ansible_lsb.id'
+
+- name: Check if mgmtvrf is installed
+  shell: "dpkg-query -f '${binary:Package}\n' -W"
+  register: mgmtvrf_installed
+  notify: Install mgmtvrf
+  when: '"Cumulus" in ansible_lsb.id'  
+  
+- name: Install mgmtvrf
+  apt: name=cl-mgmtvrf update_cache=yes state=present cache_valid_time=86400
+  when: "'cl-mgmtvrf' not in mgmtvrf_installed and 'Cumulus' in ansible_lsb.id" 
+      
+- name: Check if mgmtvrf is installed
+  stat: path=/var/lib/cl-mgmtvrf/mgmtvrf.conf
+  register: mgmtvrf
+  when: '"Cumulus" in ansible_lsb.id'  
+
+- name: Setup Mgmtvrf
+  command: cl-mgmtvrf -e
+  when: '"Cumulus" in ansible_lsb.id and mgmtvrf.stat.exists == False' 
