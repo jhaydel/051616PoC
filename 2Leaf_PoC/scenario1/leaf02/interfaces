@@ -6,29 +6,24 @@ auto eth0
 iface eth0 inet dhcp
 
 auto swp5
+iface swp5
+  post-up ip link set $IFACE promisc on
+
+auto swp6
 iface swp6
   post-up ip link set $IFACE promisc on
+ 
+auto swp43
+iface swp43     
 
-auto swp2
-iface swp2
-  post-up ip link set $IFACE promisc on
-      
-auto bridge
-iface bridge
-  bridge-ports hostbond2
-  bridge-vlan-aware yes
-  bridge-stp on
-  bridge-vids 1-1000
-  bridge-pvid 1
-  mstpctl-treeprio 20480
+auto swp44
+iface swp44     
 
-auto bridge.10
-iface bridge.10
-  address 10.10.0.11/24
+auto swp45
+iface swp45     
 
-auto bridge.20
-iface bridge.20  
-  address 10.20.0.11/24
+auto swp46
+iface swp46     
 
 auto hostbond2
 iface hostbond2
@@ -39,4 +34,18 @@ iface hostbond2
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1
   bond-min-links 1  
+
+auto vlan1
+iface vlan1
+  bridge-ports hostbond2
+  address 10.1.0.12/24
+    
+auto vlan10
+iface vlan10
+  bridge-ports hostbond2.10
+  address 10.10.0.12/24
   
+auto vlan20
+iface vlan20  
+  bridge-ports hostbond2.20
+  address 10.20.0.12/24  
