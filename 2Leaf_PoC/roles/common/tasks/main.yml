@@ -40,3 +40,7 @@
 - name: Setup Mgmtvrf
   command: cl-mgmtvrf -e
   when: '"Cumulus" in ansible_lsb.id and mgmtvrf.stat.exists == False' 
+  
+- name: Setup vxrd on Leaf01 and Leaf02
+  service: name=vxrd state=started
+  when: "'leaf' in ansible_hostname and s==1"    
