@@ -32,15 +32,15 @@ graph dc1 {
    "Spine01":"eth0" -- "OOB01":"swp1"
    "Spine02":"eth0" -- "OOB01":"swp2"
 
-   "Leaf01":"swp43" -- "Spine01":"swp32s0"
-   "Leaf01":"swp44" -- "Spine01":"swp32s1"
-   "Leaf01":"swp45" -- "Spine02":"swp32s0"
-   "Leaf01":"swp46" -- "Spine02":"swp32s1"
+   "Leaf01":"swp43" -- "Spine01":"swp43"
+   "Leaf01":"swp44" -- "Spine01":"swp44"
+   "Leaf01":"swp45" -- "Spine02":"swp43"
+   "Leaf01":"swp46" -- "Spine02":"swp44"
 
-   "Leaf02":"swp43" -- "Spine01":"swp32s2"
-   "Leaf02":"swp44" -- "Spine01":"swp32s3"
-   "Leaf02":"swp45" -- "Spine02":"swp32s2"
-   "Leaf02":"swp46" -- "Spine02":"swp32s3"
+   "Leaf02":"swp43" -- "Spine01":"swp45"
+   "Leaf02":"swp44" -- "Spine01":"swp46"
+   "Leaf02":"swp45" -- "Spine02":"swp45"
+   "Leaf02":"swp46" -- "Spine02":"swp56"
 
    "Leaf01":"swp48" -- "Leaf02":"swp48"
 
