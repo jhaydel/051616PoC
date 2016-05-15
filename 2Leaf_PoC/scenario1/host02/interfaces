@@ -15,7 +15,7 @@ iface eth1
      
 auto bond0
 iface bond0
-  bond-slaves eth0 eth1
+  bond-slaves eth2 eth3
   bond-miimon 100
   bond-mode 802.3ad  
   bond-use-carrier 1
