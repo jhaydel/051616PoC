@@ -9,7 +9,11 @@
 raise "vagrant-cumulus plugin must be installed, try $ vagrant plugin install vagrant-cumulus" unless Vagrant.has_plugin? "vagrant-cumulus"
 
 Vagrant.configure("2") do |config|
+<<<<<<< Updated upstream
   wbid = 1463190150
+=======
+  wbid = 1463339716
+>>>>>>> Stashed changes
 
   config.vm.provider "virtualbox" do |v|
     v.gui=false
@@ -22,7 +26,11 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "oob-mgmt-server"
     device.vm.box = "boxcutter/ubuntu1404"
     device.vm.provider "virtualbox" do |v|
+<<<<<<< Updated upstream
       v.name = "1463190150_oob-mgmt-server"
+=======
+      v.name = "1463339716_oob-mgmt-server"
+>>>>>>> Stashed changes
       v.memory = 400
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -69,7 +77,11 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Spine02"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
+<<<<<<< Updated upstream
       v.name = "1463190150_Spine02"
+=======
+      v.name = "1463339716_Spine02"
+>>>>>>> Stashed changes
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -169,7 +181,11 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Spine01"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
+<<<<<<< Updated upstream
       v.name = "1463190150_Spine01"
+=======
+      v.name = "1463339716_Spine01"
+>>>>>>> Stashed changes
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -269,7 +285,11 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Leaf02"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
+<<<<<<< Updated upstream
       v.name = "1463190150_Leaf02"
+=======
+      v.name = "1463339716_Leaf02"
+>>>>>>> Stashed changes
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -393,7 +413,11 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Leaf01"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
+<<<<<<< Updated upstream
       v.name = "1463190150_Leaf01"
+=======
+      v.name = "1463339716_Leaf01"
+>>>>>>> Stashed changes
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -517,7 +541,11 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Host01"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
+<<<<<<< Updated upstream
       v.name = "1463190150_Host01"
+=======
+      v.name = "1463339716_Host01"
+>>>>>>> Stashed changes
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -587,7 +615,11 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Host02"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
+<<<<<<< Updated upstream
       v.name = "1463190150_Host02"
+=======
+      v.name = "1463339716_Host02"
+>>>>>>> Stashed changes
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -657,7 +689,11 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Host03"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
+<<<<<<< Updated upstream
       v.name = "1463190150_Host03"
+=======
+      v.name = "1463339716_Host03"
+>>>>>>> Stashed changes
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -727,7 +763,11 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Host04"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
+<<<<<<< Updated upstream
       v.name = "1463190150_Host04"
+=======
+      v.name = "1463339716_Host04"
+>>>>>>> Stashed changes
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -797,7 +837,11 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "OOB01"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
+<<<<<<< Updated upstream
       v.name = "1463190150_OOB01"
+=======
+      v.name = "1463339716_OOB01"
+>>>>>>> Stashed changes
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -903,7 +947,11 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Core02"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
+<<<<<<< Updated upstream
       v.name = "1463190150_Core02"
+=======
+      v.name = "1463339716_Core02"
+>>>>>>> Stashed changes
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
@@ -967,7 +1015,11 @@ Vagrant.configure("2") do |config|
     device.vm.hostname = "Core01"
     device.vm.box = "CumulusCommunity/cumulus-vx"
     device.vm.provider "virtualbox" do |v|
+<<<<<<< Updated upstream
       v.name = "1463190150_Core01"
+=======
+      v.name = "1463339716_Core01"
+>>>>>>> Stashed changes
       v.memory = 300
     end
     device.vm.synced_folder ".", "/vagrant", disabled: true
