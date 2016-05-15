@@ -42,12 +42,12 @@ iface vlan1
     
 auto vlan10
 iface vlan10
-  bridge-ports hostbond2.10 vxlan10
+  bridge-ports hostbond1.10 vxlan10
   address 10.10.0.11/24
   
 auto vlan20
 iface vlan20  
-  bridge-ports hostbond2.20 vxlan20
+  bridge-ports hostbond1.20 vxlan20
   address 10.20.0.11/24  
 
 auto vxlan1
