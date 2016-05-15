@@ -34,6 +34,7 @@ auto peerlink
 iface peerlink
   bond-slaves swp48
   bond-miimon 100
+  bond-mode 802.3ad  
   bond-use-carrier 1
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1
@@ -51,6 +52,7 @@ auto cumulusbond
 iface cumulusbond
   bond-slaves swp1 swp2
   bond-miimon 100
+  bond-mode 802.3ad  
   bond-use-carrier 1
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1

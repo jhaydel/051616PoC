@@ -59,7 +59,7 @@ iface swp48
   
 auto bridge
 iface bridge
-  bridge-ports spinebond peerlink hostbond1 hostbond2 hostbond3
+  bridge-ports spinebond peerlink hostbond1 hostbond2 hostbond3 hostbond4
   bridge-vlan-aware yes
   bridge-stp on
   bridge-vids 1-1000
@@ -78,6 +78,7 @@ auto peerlink
 iface peerlink
   bond-slaves swp48
   bond-miimon 100
+  bond-mode 802.3ad  
   bond-use-carrier 1
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1
@@ -99,6 +100,7 @@ iface spinebond
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1
   bond-min-links 1  
+  bond-mode 802.3ad
   clag-id 1 
 
 auto hostbond1
@@ -109,6 +111,7 @@ iface hostbond1
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1
   bond-min-links 1  
+  bond-mode 802.3ad
   clag-id 2
   
 auto hostbond2
@@ -119,6 +122,7 @@ iface hostbond2
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1
   bond-min-links 1  
+  bond-mode 802.3ad
   clag-id 3
 
 auto hostbond3
@@ -129,6 +133,7 @@ iface hostbond3
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1
   bond-min-links 1  
+  bond-mode 802.3ad
   clag-id 4   
 
 auto hostbond4
@@ -139,4 +144,5 @@ iface hostbond4
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1
   bond-min-links 1  
+  bond-mode 802.3ad
   clag-id 5   

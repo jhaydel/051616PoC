@@ -25,10 +25,12 @@ auto bond0
 iface bond0
   bond-slaves eth0 eth1 eth2 eth3
   bond-miimon 100
+  bond-mode 802.3ad  
   bond-use-carrier 1
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1
   bond-min-links 1  
+  bond-mode 802.3ad
 
 auto bond0.10
 iface bond0.10

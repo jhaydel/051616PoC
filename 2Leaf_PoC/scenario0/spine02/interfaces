@@ -54,6 +54,7 @@ auto peerlink
 iface peerlink
   bond-slaves swp1
   bond-miimon 100
+  bond-mode 802.3ad  
   bond-use-carrier 1
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1
@@ -71,6 +72,7 @@ auto leafbond
 iface leafbond
   bond-slaves swp32s0 swp32s1 swp32s2 swp32s3
   bond-miimon 100
+  bond-mode 802.3ad  
   bond-use-carrier 1
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1
@@ -81,6 +83,7 @@ auto ciscobond
 iface ciscobond
   bond-slaves swp20 swp21
   bond-miimon 100
+  bond-mode 802.3ad
   bond-use-carrier 1
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1
