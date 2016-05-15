@@ -43,4 +43,4 @@
   
 - name: Setup vxrd on Leaf01 and Leaf02
   service: name=vxrd state=started
-  when: "'leaf' in ansible_hostname and s==1"    
+  when: "'leaf' in ansible_hostname and '1' in s"    
