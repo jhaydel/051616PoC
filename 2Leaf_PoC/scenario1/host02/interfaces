@@ -1,0 +1,40 @@
+auto lo
+iface lo inet loopback
+    address 10.0.0.102/32
+
+auto eth4
+iface eth4 inet dhcp
+
+auto eth0
+iface eth0
+    post-up ip link set $IFACE promisc on
+
+auto eth1
+iface eth1
+    post-up ip link set $IFACE promisc on
+    
+auto eth2
+iface eth2
+    post-up ip link set $IFACE promisc on
+
+auto eth3
+iface eth3
+    post-up ip link set $IFACE promisc on
+ 
+auto bond0
+iface bond0
+  bond-slaves eth0 eth1 eth2 eth3
+  bond-miimon 100
+  bond-mode 802.3ad  
+  bond-use-carrier 1
+  bond-xmit-hash-policy layer3+4
+  bond-lacp-rate 1
+  bond-min-links 1  
+
+auto bond0.10
+iface bond0.10
+  address 10.10.0.102/24
+
+auto bond0.20
+iface bond0.20
+  address 10.20.0.102/24
