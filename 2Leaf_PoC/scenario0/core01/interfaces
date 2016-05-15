@@ -20,6 +20,7 @@ iface bridge
   bridge-stp on
   bridge-vids 1-1000
   bridge-pvid 1
+  mstpctl-treeprio 4096
 
 auto bridge.10
 iface bridge.10

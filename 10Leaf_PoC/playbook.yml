@@ -1,0 +1,8 @@
+---        
+- hosts: localhost
+  roles:
+    - localhost
+    
+- hosts: network
+  roles:
+    - common

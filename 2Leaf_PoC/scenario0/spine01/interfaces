@@ -40,6 +40,7 @@ iface bridge
   bridge-stp on
   bridge-vids 1-1000
   bridge-pvid 1
+  mstpctl-treeprio 12288
 
 auto bridge.10
 iface bridge.10
@@ -64,7 +65,7 @@ iface peerlink.4094
   clagd-enable yes
   clagd-peer-ip 169.254.1.2
   clagd-backup-ip 10.10.0.52
-  clagd-sys-mac 44:38:39:FF:40:94    
+  clagd-sys-mac 44:38:39:FF:40:93    
   
 auto leafbond
 iface leafbond

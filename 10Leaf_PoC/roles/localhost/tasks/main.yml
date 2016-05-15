@@ -1,0 +1,14 @@
+- name: install required packages
+  apt: name='{{ item }}' state=present cache_valid_time=86400 update_cache=yes
+  with_items:
+    - apt-cacher-ng
+  delegate_to: localhost
+
+- name: restart the apt-cacher-ng
+  service: name=apt-cacher-ng state=restarted pattern=/var/run/apt-cacher-ng/pid
+  delegate_to: localhost
+
+- name: verify apt-cacher is running
+  service: name=apt-cacher-ng state=started pattern=/var/run/apt-cacher-ng/pid
+  delegate_to: localhost
+  
