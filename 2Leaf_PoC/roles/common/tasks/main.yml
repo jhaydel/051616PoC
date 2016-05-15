@@ -40,6 +40,11 @@
 - name: Setup Mgmtvrf
   command: cl-mgmtvrf -e
   when: '"Cumulus" in ansible_lsb.id and mgmtvrf.stat.exists == False' 
+
+- name: turn on LNV registration node daemon
+  lineinfile: dest=/etc/default/vxrd regexp=^START= line=START=yes
+  notify: restart vxrd  
+  when: "'leaf' in ansible_hostname and '1' in s"    
   
 - name: Setup vxrd on Leaf01 and Leaf02
   service: name=vxrd state=started
