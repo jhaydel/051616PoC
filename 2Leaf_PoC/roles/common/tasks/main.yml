@@ -61,4 +61,4 @@
 
 - name: Setup vxsnd on Spine01 and Spine02
   service: name=vxsnd state=started
-  when: "'leaf' in ansible_hostname and '1' in s"      
+  when: "'spine' in ansible_hostname and '1' in s"      
