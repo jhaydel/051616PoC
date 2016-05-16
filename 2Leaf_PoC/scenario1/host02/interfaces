@@ -5,12 +5,12 @@ iface lo inet loopback
 auto eth4
 iface eth4 inet dhcp
 
-auto eth0
-iface eth0
+auto eth2
+iface eth2
     post-up ip link set $IFACE promisc on
 
-auto eth1
-iface eth1
+auto eth3
+iface eth3
     post-up ip link set $IFACE promisc on
      
 auto bond0
