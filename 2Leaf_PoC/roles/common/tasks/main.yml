@@ -36,11 +36,10 @@
   stat: path=/var/lib/cl-mgmtvrf/mgmtvrf.conf
   register: mgmtvrf
   when: "'host' not in ansible_hostname and 'Cumulus' in ansible_lsb.id" 
-    
 
 - name: Setup Mgmtvrf
   command: cl-mgmtvrf -e
-  when: "'host' not in ansible_hostname and 'Cumulus' in ansible_lsb.id" 
+  when: "'host' not in ansible_hostname and mgmtvrf.stat.exists == False" 
 
 - name: turn on LNV registration node daemon
   lineinfile: dest=/etc/default/vxrd regexp=^START= line=START=yes
