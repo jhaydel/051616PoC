@@ -14,16 +14,19 @@ graph dc1 {
  "Host02" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_host_config.sh"]
  "Host03" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_host_config.sh"]
  "Host04" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_host_config.sh"]
+ "Chassis" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_host_config.sh"]
+ "Server" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_host_config.sh"]
+ "Array" [function="host" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/extra_host_config.sh"]
 
  "OOB01" [function="oob" os="CumulusCommunity/cumulus-vx" memory="300" config="./helper_scripts/OOB_Switch_Config.sh"]
  "oob-mgmt-server" [function="oob-server" os="boxcutter/ubuntu1404" memory="400" ubuntu=True config="./helper_scripts/OOB_Mgmt_Config.sh"]
 
    "Core01":"swp1" -- "Core02":"swp1"
 
-   "Spine01":"swp20" -- "Core01":"swp11"
-   "Spine01":"swp21" -- "Core02":"swp11"
-   "Spine02":"swp20" -- "Core01":"swp12"
-   "Spine02":"swp21" -- "Core02":"swp12"
+   "Spine01":"swp20s1" -- "Core01":"swp11"
+   "Spine01":"swp20s2" -- "Core02":"swp11"
+   "Spine02":"swp20s1" -- "Core01":"swp12"
+   "Spine02":"swp20s2" -- "Core02":"swp12"
 
    "Spine01":"swp1" -- "Spine02":"swp1"
    "Spine01":"swp3" -- "Spine01":"swp4"
@@ -58,6 +61,13 @@ graph dc1 {
 
    "Host04":"eth0" -- "Leaf01":"swp13"
    "Host04":"eth1" -- "Leaf02":"swp13"
+
+   "Server":"swp1" -- "Leaf01":"swp21"
+   "Server":"swp2" -- "Leaf02":"swp21"
+   "Array":"swp1" -- "Leaf01":"swp20"
+   "Array":"swp2" -- "Leaf02":"swp20"
+   "Chassis":"swp1" -- "Leaf01":"swp49"
+   "Chassis":"swp2" -- "Leaf02":"swp49"
    
    "oob-mgmt-server":"eth1" -- "OOB01":"swp24"
    "OOB01":"swp6" -- "Core01":"eth0"
