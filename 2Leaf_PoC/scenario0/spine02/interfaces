@@ -5,34 +5,6 @@ iface lo inet loopback
 auto eth0
 iface eth0 inet dhcp
 
-auto swp1
-iface swp1
-  post-up ip link set $IFACE promisc on
-
-auto swp32s0
-iface swp32s0
-  post-up ip link set $IFACE promisc on
-
-auto swp32s1
-iface swp32s1
-  post-up ip link set $IFACE promisc on
- 
-auto swp32s2
-iface swp32s2
-  post-up ip link set $IFACE promisc on
-
-auto swp32s3
-iface swp32s3
-  post-up ip link set $IFACE promisc on
-
-auto swp20
-iface swp20
-  post-up ip link set $IFACE promisc on
-
-auto swp21
-iface swp21
-  post-up ip link set $IFACE promisc on
- 
 auto bridge
 iface bridge
   bridge-ports leafbond peerlink ciscobond
@@ -81,7 +53,7 @@ iface leafbond
 
 auto ciscobond
 iface ciscobond
-  bond-slaves swp20 swp21
+  bond-slaves swp20s0 swp20s1
   bond-miimon 100
   bond-mode 802.3ad
   bond-use-carrier 1

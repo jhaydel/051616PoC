@@ -1,8 +1,4 @@
 ---        
-- hosts: localhost
-  roles:
-    - localhost
-    
-- hosts: network
+- hosts: poc
   roles:
     - common

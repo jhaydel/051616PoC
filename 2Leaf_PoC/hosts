@@ -22,3 +22,6 @@ spine
 servers
 core
 
+[poc:children]
+leaf
+spine

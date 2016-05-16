@@ -6,11 +6,11 @@ iface lo inet loopback
 auto eth0
 iface eth0 inet dhcp
 
-auto swp20
-iface swp20
+auto swp20s1
+iface swp20s1
 
-auto swp21
-iface swp21
+auto swp20s2
+iface swp20s2
 
 auto swp32s0
 iface swp32s0
