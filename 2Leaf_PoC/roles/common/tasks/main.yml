@@ -30,7 +30,7 @@
  
 - name: Install mgmtvrf
   apt: name=cl-mgmtvrf update_cache=yes state=present cache_valid_time=86400
-  when: "'host' not in ansible_hostname and 'Cumulus' in ansible_lsb.id" 
+  when: "'host' not in ansible_hostname and 'cl-mgmtvrf' not in mgmtvrf_installed" 
       
 - name: Check if mgmtvrf is installed
   stat: path=/var/lib/cl-mgmtvrf/mgmtvrf.conf
