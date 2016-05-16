@@ -22,12 +22,18 @@ iface bond0
   bond-xmit-hash-policy layer3+4
   bond-lacp-rate 1
   bond-min-links 1  
+ 
+auto vlan1
+iface vlan1
+  bridge-ports bond0 
   address 10.1.0.102/24
   
-auto bond0.10
-iface bond0.10
+auto vlan10
+iface vlan10
+  bridge-ports bond0.10
   address 10.10.0.102/24
 
-auto bond0.20
-iface bond0.20
+auto vlan20
+iface vlan20
+  bridge-ports bond0.20
   address 10.20.0.102/24
