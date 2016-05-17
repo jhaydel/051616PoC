@@ -1,0 +1,8 @@
+graph dc1 {
+   "leaf02":"swp43" -- "spine01":"swp32s0"
+   "leaf02":"swp44" -- "spine01":"swp32s1"
+   "leaf02":"swp45" -- "spine02":"swp32s0"
+   "leaf02":"swp46" -- "spine02":"swp32s1"
+   "leaf02":"swp48" -- "leaf01":"swp48"
+   "leaf02":"eth0" -- "oob01":"swp3"
+}

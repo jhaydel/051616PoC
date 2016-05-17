@@ -1,68 +1,66 @@
 auto lo
 iface lo inet loopback
-    address 10.0.0.12/32
-    vxrd-src-ip 10.0.0.12
-    vxrd-svcnode-ip 10.10.10.10
-    
+	address 10.0.0.12/32
+	vxrd-src-ip 10.0.0.12
+	vxrd-svcnode-ip 10.10.10.10
+
 auto eth0
 iface eth0 inet dhcp
 
 auto swp5
 iface swp5
-  post-up ip link set $IFACE promisc on
+	post-up ip link set swp5 promisc on
 
 auto swp6
 iface swp6
-  post-up ip link set $IFACE promisc on
- 
+	post-up ip link set swp6 promisc on
+
+auto swp20
+iface swp20
+
+auto swp21
+iface swp21
+
+auto swp22
+iface swp22
+
 auto swp43
-iface swp43     
+iface swp43
 
 auto swp44
-iface swp44     
+iface swp44
 
 auto swp45
-iface swp45     
+iface swp45
 
 auto swp46
-iface swp46     
+iface swp46
 
-auto hostbond2
-iface hostbond2
-  bond-slaves swp5 swp6
-  bond-miimon 100
-  bond-mode 802.3ad  
-  bond-use-carrier 1
-  bond-xmit-hash-policy layer3+4
-  bond-lacp-rate 1
-  bond-min-links 1  
+auto vlan300
+iface vlan300
+	bridge-ports swp5 vxlan300
+	address 10.1.0.12/24
 
-auto vlan1
-iface vlan1
-  bridge-ports hostbond2 vxlan1
-  address 10.1.0.12/24
-    
 auto vlan10
 iface vlan10
-  bridge-ports hostbond2.10 vxlan10
-  address 10.10.0.12/24
-  
+	bridge-ports swp5.10 vxlan10
+	address 10.10.0.12/24
+
 auto vlan20
-iface vlan20  
-  bridge-ports hostbond2.20 vxlan20
-  address 10.20.0.12/24  
-  
-auto vxlan1
-iface vxlan1
-  vxlan-id 1
-  vxlan-local-tunnelip 10.0.0.12
-  
+iface vlan20
+	bridge-ports swp5.20 vxlan20 swp20 swp21 swp22
+
+auto vxlan300
+iface vxlan300
+	vxlan-id 300
+	vxlan-local-tunnelip 10.0.0.12
+
 auto vxlan10
 iface vxlan10
-  vxlan-id 10
-  vxlan-local-tunnelip 10.0.0.12  
-  
+	vxlan-id 10
+	vxlan-local-tunnelip 10.0.0.12
+
 auto vxlan20
 iface vxlan20
-  vxlan-id 20
-  vxlan-local-tunnelip 10.0.0.12  
+	vxlan-id 20
+	vxlan-local-tunnelip 10.0.0.12
