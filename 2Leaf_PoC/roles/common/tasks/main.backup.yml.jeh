@@ -19,10 +19,6 @@
   copy: src=scenario{{s}}/{{ansible_hostname}}/daemons dest=/etc/quagga/
   when: '"Cumulus" in ansible_lsb.id'
   
-- name: copy PTMD files
-  copy: src=scenario{{s}}/{{ansible_hostname}}/topology.dot dest=/etc/ptmd/
-  when: '"Cumulus" in ansible_lsb.id'
-  
 - name: copy Quagga conf
   copy: src=scenario{{s}}/{{ansible_hostname}}/Quagga.conf dest=/etc/quagga/
   when: '"Cumulus" in ansible_lsb.id'

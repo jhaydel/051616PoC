@@ -1,0 +1,12 @@
+graph dc1 {
+   "Spine02":"swp20s1" -- "Core01":"swp12"
+   "Spine02":"swp20s2" -- "Core02":"swp12"
+   "Spine01":"swp1" -- "Spine02":"swp1"
+   "Spine02":"swp3" -- "Spine02":"swp4"
+   "Spine02":"eth0" -- "OOB01":"swp2"
+   "Leaf01":"swp45" -- "Spine02":"swp32s0"
+   "Leaf01":"swp46" -- "Spine02":"swp32s1"
+   "Leaf02":"swp45" -- "Spine02":"swp32s2"
+   "Leaf02":"swp46" -- "Spine02":"swp32s3"
+}
+
