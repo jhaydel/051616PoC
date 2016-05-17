@@ -26,17 +26,39 @@
   shell: "dpkg-query -f '${binary:Package}\n' -W"
   register: mgmtvrf_installed
   notify: Install mgmtvrf
-  when: '"Cumulus" in ansible_lsb.id'  
-  
+  when: "'host' not in ansible_hostname and 'Cumulus' in ansible_lsb.id" 
+ 
 - name: Install mgmtvrf
   apt: name=cl-mgmtvrf update_cache=yes state=present cache_valid_time=86400
-  when: "'cl-mgmtvrf' not in mgmtvrf_installed and 'Cumulus' in ansible_lsb.id" 
+  when: "'host' not in ansible_hostname and 'cl-mgmtvrf' not in mgmtvrf_installed" 
       
 - name: Check if mgmtvrf is installed
   stat: path=/var/lib/cl-mgmtvrf/mgmtvrf.conf
   register: mgmtvrf
-  when: '"Cumulus" in ansible_lsb.id'  
+  when: "'host' not in ansible_hostname and 'Cumulus' in ansible_lsb.id" 
 
 - name: Setup Mgmtvrf
   command: cl-mgmtvrf -e
-  when: '"Cumulus" in ansible_lsb.id and mgmtvrf.stat.exists == False' 
+  when: "'host' not in ansible_hostname and mgmtvrf.stat.exists == False" 
+
+- name: turn on LNV registration node daemon
+  lineinfile: dest=/etc/default/vxrd regexp=^START= line=START=yes
+  notify: restart vxrd  
+  when: "'leaf' in ansible_hostname and '1' in s"    
+  
+- name: Setup vxrd on Leaf01 and Leaf02
+  service: name=vxrd state=started
+  when: "'leaf' in ansible_hostname and '1' in s"    
+
+- name: copy vxsnd.conf
+  copy: src=scenario{{s}}/{{ansible_hostname}}/vxsnd.conf dest=/etc/
+  when: "'spine' in ansible_hostname and '1' in s"   
+    
+- name: turn on LNV service node daemon on Spine01 and Spine02
+  lineinfile: dest=/etc/default/vxsnd regexp=^START= line=START=yes
+  notify: restart vxrd  
+  when: "'spine' in ansible_hostname and '1' in s"   
+
+- name: Setup vxsnd on Spine01 and Spine02
+  service: name=vxsnd state=started
+  when: "'spine' in ansible_hostname and '1' in s"      
